@@ -1,0 +1,1349 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>🚀 Jogo do Foguete</title>
+
+    <style>
+```html
+<style>
+
+/* =========================================
+   BASE DO JOGO
+========================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    background:
+        radial-gradient(
+            circle at top,
+            #3b1f35 0%,
+            #1f2022 35%,
+            #121212 75%
+        );
+    color: #fff;
+    padding: 20px;
+}
+
+
+/* =========================================
+   CONTAINER
+========================================= */
+
+.game {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+
+    background: #1f2122;
+
+    border: 1px solid #3a3c3d;
+    border-radius: 18px;
+
+    padding: 20px;
+
+    box-shadow:
+        0 20px 70px rgba(0, 0, 0, 0.6);
+}
+
+
+/* =========================================
+   CABEÇALHO
+========================================= */
+
+.header {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+.title {
+    font-size: 23px;
+    font-weight: 700;
+}
+
+.title span {
+    color: #ec6090;
+}
+
+.status {
+    margin-top: 6px;
+    color: #aaa;
+    font-size: 13px;
+}
+
+
+/* =========================================
+   SALDO
+========================================= */
+
+.balance {
+    min-width: 150px;
+
+    padding: 12px 20px;
+
+    background: #181a1b;
+
+    border: 1px solid #343637;
+    border-radius: 12px;
+
+    text-align: center;
+}
+
+.balance-label {
+    color: #888;
+    font-size: 11px;
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 4px;
+}
+
+.balance-value {
+    color: #ec6090;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+
+/* =========================================
+   MULTIPLICADOR PRINCIPAL
+========================================= */
+
+.multiplier {
+    min-width: 110px;
+
+    color: #fff;
+
+    font-size: 40px;
+    font-weight: 800;
+
+    text-align: right;
+
+    white-space: nowrap;
+
+    text-shadow:
+        0 0 15px rgba(236, 96, 144, 0.45);
+}
+
+
+/* =========================================
+   GRÁFICO
+========================================= */
+
+.chart {
+    position: relative;
+
+    width: 100%;
+    height: 440px;
+
+    overflow: hidden;
+
+    border-radius: 15px;
+
+    background:
+        radial-gradient(
+            circle at bottom left,
+            rgba(236, 96, 144, 0.10),
+            transparent 45%
+        ),
+        #151718;
+
+    border: 1px solid #343637;
+
+    box-shadow:
+        inset 0 0 40px rgba(0, 0, 0, 0.35);
+
+    margin-bottom: 20px;
+}
+
+
+/* GRADE DO GRÁFICO */
+
+.chart::before {
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255,255,255,0.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 55px 55px;
+
+    pointer-events: none;
+}
+
+
+/* SVG */
+
+.chart svg {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    pointer-events: none;
+}
+
+
+/* LINHA PRINCIPAL */
+
+#trail {
+    fill: none;
+
+    stroke: #ec6090;
+
+    stroke-width: 5;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter:
+        drop-shadow(
+            0 0 8px rgba(236, 96, 144, 0.8)
+        );
+}
+
+
+/* BRILHO DA LINHA */
+
+#trailGlow {
+    fill: none;
+
+    stroke: rgba(236, 96, 144, 0.18);
+
+    stroke-width: 15;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    filter: blur(5px);
+}
+
+
+/* =========================================
+   FOGUETE
+========================================= */
+
+.rocket {
+    position: absolute;
+
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 35px;
+
+    transform:
+        translate(-50%, -50%)
+        rotate(35deg);
+
+    z-index: 5;
+
+    pointer-events: none;
+
+    filter:
+        drop-shadow(
+            0 0 10px rgba(236, 96, 144, 0.9)
+        );
+}
+
+
+/* =========================================
+   MULTIPLICADOR DO FOGUETE
+========================================= */
+
+.rocket-multiplier {
+    position: absolute;
+
+    z-index: 10;
+
+    pointer-events: none;
+
+    padding: 5px 9px;
+
+    border-radius: 7px;
+
+    background: rgba(31, 33, 34, 0.92);
+
+    border: 1px solid rgba(236, 96, 144, 0.55);
+
+    color: #fff;
+
+    font-size: 14px;
+    font-weight: 800;
+
+    white-space: nowrap;
+
+    transform:
+        translate(15px, -38px);
+
+    box-shadow:
+        0 0 12px rgba(236, 96, 144, 0.2);
+}
+
+
+/* =========================================
+   EIXOS
+========================================= */
+
+ 
+  /* =========================================
+   EIXOS
+========================================= */
+
+.axis {
+    position: absolute;
+
+    left: 15px;
+    right: 15px;
+    bottom: 10px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    color: #666;
+
+    font-size: 11px;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   CONTROLES
+========================================= */
+
+.controls {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 20px;
+}
+
+
+/* =========================================
+   PAINÉIS
+========================================= */
+
+.panel {
+    background: #181a1b;
+
+    border: 1px solid #343637;
+
+    border-radius: 13px;
+
+    padding: 15px;
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.panel input {
+    width: 100%;
+
+    margin-top: 8px;
+    margin-bottom: 10px;
+
+    padding: 12px;
+
+    background: #111;
+
+    border: 1px solid #3a3c3d;
+
+    border-radius: 8px;
+
+    color: #fff;
+
+    font-size: 15px;
+
+    outline: none;
+}
+
+.panel input:focus {
+    border-color: #ec6090;
+}
+
+
+/* =========================================
+   BOTÕES
+========================================= */
+
+.panel button {
+    width: 100%;
+
+    min-height: 45px;
+
+    margin-top: 10px;
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #ec6090;
+
+    color: #fff;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    font-size: 15px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    display: block;
+}
+
+.panel button:hover:not(:disabled) {
+    filter: brightness(1.12);
+}
+
+.panel button:active:not(:disabled) {
+    transform: scale(0.98);
+}
+
+.panel button:disabled {
+    opacity: 0.4;
+
+    cursor: not-allowed;
+}
+
+
+/* BOTÕES ESPECÍFICOS */
+
+#cashout {
+    background: #7357d9;
+}
+
+#resetBalance {
+    background: #333638;
+}
+
+
+/* =========================================
+   RESULTADO
+========================================= */
+
+.result-title {
+    color: #999;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.result {
+    margin-top: 10px;
+
+    color: #fff;
+
+    font-size: 24px;
+
+    font-weight: 800;
+}
+
+.info {
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    margin-top: 15px;
+
+    color: #888;
+
+    font-size: 13px;
+}
+
+.info b {
+    color: #fff;
+}
+
+
+/* =========================================
+   RESPONSIVO
+========================================= */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 10px;
+    }
+
+    .game {
+        padding: 12px;
+    }
+
+    .header {
+        flex-wrap: wrap;
+    }
+
+    .multiplier {
+        font-size: 32px;
+    }
+
+    .chart {
+        height: 350px;
+    }
+
+    .controls {
+        grid-template-columns: 1fr;
+    }
+}
+    </style>
+
+</head>
+
+
+<body>
+
+
+<main class="game">
+
+
+    <!-- CABEÇALHO -->
+
+    <div class="header">
+
+        <div>
+
+            <div class="title">
+                🚀 <span>Foguete</span>
+            </div>
+
+            <div class="status" id="status">
+                Pronto para iniciar
+            </div>
+
+        </div>
+
+
+        <!-- SALDO -->
+
+        <div class="balance">
+
+            <div class="balance-label">
+                🪙 Saldo
+            </div>
+
+            <div class="balance-value" id="balance">
+                <span>1000</span> pontos
+            </div>
+
+        </div>
+
+
+        <!-- MULTIPLICADOR -->
+
+        <div class="multiplier" id="multiplier">
+            1.00x
+        </div>
+
+    </div>
+
+
+    <!-- GRÁFICO -->
+
+    <div
+        class="chart"
+        id="chart"
+    >
+
+        <svg
+            viewBox="0 0 900 440"
+            preserveAspectRatio="none"
+        >
+
+            <polyline
+                id="trailGlow"
+                points="20,410"
+            ></polyline>
+
+            <polyline
+                id="trail"
+                points="20,410"
+            ></polyline>
+
+        </svg>
+
+
+        <div
+            class="rocket"
+            id="rocket"
+        >
+            🚀
+        </div>
+
+
+        <div
+            class="rocket-multiplier"
+            id="rocketMultiplier"
+        >
+            1.00x
+        </div>
+
+
+        <div class="axis">
+
+            <span>0s</span>
+
+            <span>tempo</span>
+
+            <span>multiplicador ↑</span>
+
+        </div>
+
+    </div>
+
+
+    <!-- CONTROLES -->
+
+    <div class="controls">
+
+
+        <!-- PONTOS -->
+
+        <div class="panel">
+
+            <label for="bet">
+                Pontos da rodada
+            </label>
+
+
+            <input
+                id="bet"
+                type="number"
+                min="1"
+                step="1"
+                value="10"
+            >
+
+
+            <button id="start">
+                🚀 Iniciar foguete
+            </button>
+
+
+            <button
+                id="cashout"
+                disabled
+            >
+                💰 Sacar pontos
+            </button>
+
+
+            <button id="resetBalance">
+                🔄 Restaurar 1.000 pontos
+            </button>
+
+        </div>
+
+
+        <!-- RESULTADO -->
+
+        <div class="panel">
+
+            <div class="result-title">
+                Resultado da rodada
+            </div>
+
+
+            <div
+                class="result"
+                id="result"
+            >
+                —
+            </div>
+
+
+            <div class="info">
+
+                <span>
+                    Pontos:
+                    <b id="value">10</b>
+                </span>
+
+
+                <span>
+                    Status:
+                    <b id="roundStatus">Parado</b>
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+alert("JavaScript carregou!");
+/* ================================
+   ELEMENTOS
+================================ */
+
+const rocket =
+    document.getElementById("rocket");
+
+const rocketMultiplier =
+    document.getElementById("rocketMultiplier");
+
+const trail =
+    document.getElementById("trail");
+
+const trailGlow =
+    document.getElementById("trailGlow");
+
+const multiplierEl =
+    document.getElementById("multiplier");
+
+const statusEl =
+    document.getElementById("status");
+
+const resultEl =
+    document.getElementById("result");
+
+const roundStatusEl =
+    document.getElementById("roundStatus");
+
+const betInput =
+    document.getElementById("bet");
+
+const valueEl =
+    document.getElementById("value");
+
+const startBtn =
+    document.getElementById("start");
+
+const cashoutBtn =
+    document.getElementById("cashout");
+
+const resetBalanceBtn =
+    document.getElementById("resetBalance");
+
+const balanceEl =
+    document.getElementById("balance");
+
+const chart =
+    document.getElementById("chart");
+
+
+/* ================================
+   VARIÁVEIS
+================================ */
+
+let balance = 1000;
+
+let running = false;
+
+let startTime = 0;
+
+let animationId = null;
+
+let crashPoint = 0;
+
+let points = [];
+
+let currentBet = 0;
+
+
+/* ================================
+   ATUALIZAR SALDO
+================================ */
+
+function updateBalance() {
+
+    balanceEl.innerHTML =
+        "<span>"
+        + Math.floor(balance)
+        + "</span> pontos";
+
+}
+
+
+/* ================================
+   VERIFICAR SALDO
+================================ */
+
+function checkBalance() {
+
+    if (balance <= 0) {
+
+        startBtn.disabled = true;
+
+        statusEl.textContent =
+            "Você ficou sem pontos.";
+
+        resultEl.textContent =
+            "🪙 Saldo zerado";
+
+    } else {
+
+        startBtn.disabled = false;
+
+    }
+
+}
+
+
+/* ================================
+   RESETAR GRÁFICO
+================================ */
+
+function resetGraph() {
+
+    points = [];
+
+    trail.setAttribute(
+        "points",
+        "20,410"
+    );
+
+    trailGlow.setAttribute(
+        "points",
+        "20,410"
+    );
+
+    rocket.style.left =
+        "20px";
+
+    rocket.style.top =
+        "410px";
+
+    rocketMultiplier.style.left =
+        "20px";
+
+    rocketMultiplier.style.top =
+        "410px";
+
+    multiplierEl.textContent =
+        "1.00x";
+
+    rocketMultiplier.textContent =
+        "1.00x";
+
+}
+
+
+/* ================================
+   GERAR CRASH
+================================ */
+
+function generateCrashPoint() {
+
+    return (
+        1.25 +
+        Math.random() * 5.75
+    );
+
+}
+
+
+/* ================================
+   INICIAR JOGO
+================================ */
+
+function startGame() {
+
+    if (running) return;
+
+
+    const bet =
+        Math.floor(
+            Number(betInput.value)
+        );
+
+
+    if (
+        !Number.isFinite(bet) ||
+        bet < 1
+    ) {
+
+        resultEl.textContent =
+            "⚠️ Digite pelo menos 1 ponto.";
+
+        return;
+
+    }
+
+
+    if (bet > balance) {
+
+        resultEl.textContent =
+            "⚠️ Você não tem pontos suficientes.";
+
+        return;
+
+    }
+
+
+    currentBet = bet;
+
+
+    /* Retira os pontos da rodada */
+
+    balance -= currentBet;
+
+    updateBalance();
+
+
+    valueEl.textContent =
+        currentBet;
+
+
+    resetGraph();
+
+
+    crashPoint =
+        generateCrashPoint();
+
+
+    running = true;
+
+
+    startTime =
+        performance.now();
+
+
+    startBtn.disabled =
+        true;
+
+    cashoutBtn.disabled =
+        false;
+
+    resetBalanceBtn.disabled =
+        true;
+
+    betInput.disabled =
+        true;
+
+
+    resultEl.textContent =
+        "—";
+
+
+    statusEl.textContent =
+        "Foguete subindo...";
+
+
+    roundStatusEl.textContent =
+        "Em andamento";
+
+
+    animationId =
+        requestAnimationFrame(update);
+
+}
+
+
+/* ================================
+   ATUALIZAR JOGO
+================================ */
+
+function update(now) {
+
+    if (!running) return;
+
+
+    const elapsed =
+        (now - startTime) / 1000;
+
+
+    const multiplier =
+        Math.exp(
+            elapsed * 0.23
+        );
+
+
+    const displayMultiplier =
+        multiplier.toFixed(2) + "x";
+
+
+    multiplierEl.textContent =
+        displayMultiplier;
+
+
+    rocketMultiplier.textContent =
+        displayMultiplier;
+
+
+    const width =
+        chart.clientWidth;
+
+
+    const height =
+        chart.clientHeight;
+
+
+    const progress =
+        Math.min(
+            0.95,
+            elapsed / 12
+        );
+
+
+    const x =
+        20 +
+        progress *
+        (width - 55);
+
+
+    const normalized =
+        Math.min(
+            0.93,
+            Math.log(multiplier) / 2
+        );
+
+
+    const y =
+        height -
+        30 -
+        normalized *
+        (height - 65);
+
+
+    points.push([
+        x,
+        y
+    ]);
+
+
+    if (
+        points.length > 250
+    ) {
+
+        points.shift();
+
+    }
+
+
+    const pointString =
+        points
+            .map(
+                point =>
+                    point[0].toFixed(1)
+                    + ","
+                    + point[1].toFixed(1)
+            )
+            .join(" ");
+
+
+    trail.setAttribute(
+        "points",
+        pointString
+    );
+
+
+    trailGlow.setAttribute(
+        "points",
+        pointString
+    );
+
+
+    rocket.style.left =
+        x + "px";
+
+    rocket.style.top =
+        y + "px";
+
+
+    rocketMultiplier.style.left =
+        x + "px";
+
+    rocketMultiplier.style.top =
+        y + "px";
+
+
+    if (
+        multiplier >=
+        crashPoint
+    ) {
+
+        crash(multiplier);
+
+        return;
+
+    }
+
+
+    animationId =
+        requestAnimationFrame(update);
+
+}
+
+
+/* ================================
+   CRASH
+================================ */
+
+function crash(finalMultiplier) {
+
+    running = false;
+
+
+    cancelAnimationFrame(
+        animationId
+    );
+
+
+    const finalValue =
+        finalMultiplier.toFixed(2);
+
+
+    multiplierEl.textContent =
+        finalValue + "x";
+
+
+    rocketMultiplier.textContent =
+        "💥 " + finalValue + "x";
+
+
+    statusEl.textContent =
+        "O foguete caiu!";
+
+
+    roundStatusEl.textContent =
+        "Perdeu";
+
+
+    resultEl.textContent =
+        "💥 Perdeu "
+        + currentBet
+        + " pontos";
+
+
+    startBtn.disabled =
+        false;
+
+    cashoutBtn.disabled =
+        true;
+
+    resetBalanceBtn.disabled =
+        false;
+
+    betInput.disabled =
+        false;
+
+
+    currentBet = 0;
+
+
+    updateBalance();
+
+    checkBalance();
+
+}
+
+
+/* ================================
+   SACAR PONTOS
+================================ */
+
+function cashout() {
+
+    if (!running) return;
+
+
+    const current =
+        Number(
+            multiplierEl.textContent
+                .replace("x", "")
+        );
+
+
+    const payout =
+        Math.floor(
+            currentBet * current
+        );
+
+
+    balance += payout;
+
+
+    running = false;
+
+
+    cancelAnimationFrame(
+        animationId
+    );
+
+
+    statusEl.textContent =
+        "Você sacou!";
+
+
+    roundStatusEl.textContent =
+        "Sacado";
+
+
+    resultEl.textContent =
+        "✅ +" + payout + " pontos";
+
+
+    startBtn.disabled =
+        false;
+
+    cashoutBtn.disabled =
+        true;
+
+    resetBalanceBtn.disabled =
+        false;
+
+    betInput.disabled =
+        false;
+
+
+    currentBet = 0;
+
+
+    updateBalance();
+
+    checkBalance();
+
+}
+
+
+/* ================================
+   RESTAURAR SALDO
+================================ */
+
+resetBalanceBtn.addEventListener(
+    "click",
+    function() {
+
+        if (running) return;
+
+
+        balance = 1000;
+
+
+        updateBalance();
+
+
+        resultEl.textContent =
+            "🔄 Saldo restaurado";
+
+
+        statusEl.textContent =
+            "Pronto para iniciar";
+
+
+        roundStatusEl.textContent =
+            "Parado";
+
+
+        startBtn.disabled =
+            false;
+
+    }
+);
+
+
+/* ================================
+   ATUALIZAR PONTOS
+================================ */
+
+betInput.addEventListener(
+    "input",
+    function() {
+
+        const value =
+            Math.max(
+                0,
+                Math.floor(
+                    Number(betInput.value) || 0
+                )
+            );
+
+
+        valueEl.textContent =
+            value;
+
+    }
+);
+
+
+/* ================================
+   BOTÕES
+================================ */
+
+startBtn.addEventListener(
+    "click",
+    startGame
+);
+
+
+cashoutBtn.addEventListener(
+    "click",
+    cashout
+);
+
+
+/* ================================
+   INICIALIZAÇÃO
+================================ */
+
+updateBalance();
+
+resetGraph();
+
+checkBalance();
+
+
+</script>
+
+
+</body>
+
+</html>
+```

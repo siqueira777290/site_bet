@@ -1,0 +1,619 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Slots - Cyborg Gaming</title>
+
+  <style>
+    :root {
+      --pink: #ec6090;
+      --purple: #7357d9;
+      --bg: #1f2122;
+      --panel: #27292a;
+      --text: #fff;
+      --muted: #aaa;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 24px 16px 40px;
+      background:
+        radial-gradient(ellipse at top, #392448 0%, transparent 55%),
+        var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    button, input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+
+    .logo {
+      color: var(--pink);
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .logo span {
+      color: white;
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+      background: #343637;
+      padding: 11px 16px;
+      border-radius: 10px;
+    }
+
+    .back:hover {
+      background: var(--purple);
+    }
+
+    .heading {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .heading h1 {
+      font-size: clamp(32px, 7vw, 48px);
+      margin: 0 0 8px;
+      color: var(--pink);
+      text-shadow: 0 0 22px #ec609066;
+    }
+
+    .heading p {
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .game {
+      background: linear-gradient(145deg, #292b2d, #202122);
+      border: 1px solid #ffffff12;
+      border-radius: 22px;
+      padding: clamp(16px, 4vw, 32px);
+      box-shadow: 0 18px 60px #0006;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: #191a1b;
+      border: 1px solid #ffffff12;
+      border-radius: 13px;
+      padding: 14px;
+    }
+
+    .stat small {
+      color: var(--muted);
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .stat strong {
+      color: var(--pink);
+      font-size: clamp(21px, 4vw, 28px);
+      overflow-wrap: anywhere;
+    }
+
+    .machine {
+      padding: 16px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #7357d9, #38245f 55%, #ec6090);
+      box-shadow: 0 0 28px #7357d933;
+    }
+
+    .machine-title {
+      text-align: center;
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 4px;
+      margin: 0 0 15px;
+      color: #fff;
+    }
+
+    .reels {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 9px;
+      padding: 10px;
+      background: #131415;
+      border-radius: 15px;
+      border: 2px solid #ffffff30;
+    }
+
+    .reel {
+      min-width: 0;
+      height: clamp(95px, 20vw, 150px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: linear-gradient(#f7f4ff, #d9d2ee);
+      border-radius: 10px;
+      color: #202026;
+      font-size: clamp(40px, 10vw, 72px);
+      box-shadow: inset 0 0 15px #0002;
+      user-select: none;
+    }
+
+    .reel.spinning {
+      animation: shake .09s linear infinite;
+      filter: blur(1px);
+    }
+
+    @keyframes shake {
+      0% { transform: translateY(-3px); }
+      50% { transform: translateY(3px); }
+      100% { transform: translateY(-3px); }
+    }
+
+    .message {
+      min-height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-weight: bold;
+      font-size: 17px;
+      margin: 15px 0 4px;
+      color: white;
+    }
+
+    .message.win {
+      color: #8effc1;
+      text-shadow: 0 0 15px #55ff9b55;
+    }
+
+    .message.lose {
+      color: #ff9cb9;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-top: 22px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      display: flex;
+      align-items: center;
+      background: #191a1b;
+      border: 1px solid #ffffff20;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .input-wrap button {
+      border: 0;
+      background: #343637;
+      color: white;
+      width: 42px;
+      height: 44px;
+      font-size: 22px;
+    }
+
+    .input-wrap input {
+      min-width: 0;
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: white;
+      text-align: center;
+      font-weight: bold;
+      padding: 8px 3px;
+    }
+
+    .spin {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 18px;
+      background: linear-gradient(100deg, var(--pink), var(--purple));
+      color: white;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      box-shadow: 0 6px 20px #ec609933;
+      transition: transform .15s, opacity .15s;
+    }
+
+    .spin:hover:not(:disabled) {
+      transform: translateY(-2px);
+    }
+
+    .spin:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    .secondary {
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border: 1px solid #ffffff20;
+      border-radius: 10px;
+      background: #343637;
+      color: white;
+    }
+
+    .secondary:hover {
+      background: #424445;
+    }
+
+    .paytable {
+      margin-top: 25px;
+      padding: 18px;
+      background: #191a1b;
+      border-radius: 14px;
+    }
+
+    .paytable h2 {
+      font-size: 18px;
+      margin: 0 0 12px;
+    }
+
+    .payrow {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #ffffff12;
+      color: #ddd;
+    }
+
+    .payrow:last-child {
+      border-bottom: 0;
+    }
+
+    .payrow strong {
+      color: var(--pink);
+      text-align: right;
+    }
+
+    .note {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      .machine {
+        padding: 10px;
+      }
+
+      .reels {
+        gap: 5px;
+        padding: 6px;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+
+    <header class="topbar">
+      <div class="logo">CYBORG <span>GAMING</span></div>
+      <a class="back" href="index.html">← Voltar aos jogos</a>
+    </header>
+
+    <section class="heading">
+      <h1>🎰 SLOTS</h1>
+      <p>Gire os rolos e teste sua sorte!</p>
+    </section>
+
+    <section class="game">
+
+      <div class="stats">
+        <div class="stat">
+          <small>💰 Seu saldo</small>
+          <strong id="balance">1.000</strong>
+          <small>pontos</small>
+        </div>
+
+        <div class="stat">
+          <small>🏆 Último prêmio</small>
+          <strong id="lastWin">0</strong>
+          <small>pontos</small>
+        </div>
+      </div>
+
+      <div class="machine">
+        <p class="machine-title">★ LUCKY SLOTS ★</p>
+
+        <div class="reels">
+          <div class="reel" id="reel0">🍒</div>
+          <div class="reel" id="reel1">🍋</div>
+          <div class="reel" id="reel2">💎</div>
+        </div>
+
+        <div class="message" id="message" aria-live="polite">
+          Escolha sua aposta e gire!
+        </div>
+      </div>
+
+      <div class="controls">
+        <div class="field">
+          <label for="bet">Valor da aposta</label>
+          <div class="input-wrap">
+            <button id="minus" type="button" aria-label="Diminuir aposta">−</button>
+            <input id="bet" type="number" min="1" max="1000"
+              step="1" value="10">
+            <button id="plus" type="button" aria-label="Aumentar aposta">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Multiplicador do prêmio</label>
+          <div class="input-wrap">
+            <div style="padding:12px; text-align:center; width:100%">
+              <strong style="color:#ec6090">Até 10x</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="spin" id="spin" type="button">
+        🎰 GIRAR!
+      </button>
+
+      <button class="secondary" id="reset" type="button">
+        ↻ Restaurar 1.000 pontos
+      </button>
+
+      <div class="paytable">
+        <h2>📋 Tabela de prêmios</h2>
+
+        <div class="payrow">
+          <span>💎 💎 💎 — 3 diamantes</span>
+          <strong>10x a aposta</strong>
+        </div>
+
+        <div class="payrow">
+          <span>7️⃣ 7️⃣ 7️⃣ — Três setes</span>
+          <strong>8x a aposta</strong>
+        </div>
+
+        <div class="payrow">
+          <span>⭐ ⭐ ⭐ — Três estrelas</span>
+          <strong>5x a aposta</strong>
+        </div>
+
+        <div class="payrow">
+          <span>🍒 🍒 🍒 — Três cerejas</span>
+          <strong>3x a aposta</strong>
+        </div>
+
+        <div class="payrow">
+          <span>Quaisquer 2 símbolos iguais</span>
+          <strong>1,5x a aposta</strong>
+        </div>
+      </div>
+
+      <p class="note">
+        Jogo demonstrativo com pontos virtuais, sem dinheiro real.
+        Os resultados são gerados aleatoriamente.
+      </p>
+
+    </section>
+  </main>
+
+  <script>
+    const symbols = [
+      { icon: "🍒", name: "cerejas" },
+      { icon: "🍋", name: "limões" },
+      { icon: "🍇", name: "uvas" },
+      { icon: "🔔", name: "sinos" },
+      { icon: "⭐", name: "estrelas" },
+      { icon: "7️⃣", name: "setes" },
+      { icon: "💎", name: "diamantes" }
+    ];
+
+    const balanceEl = document.getElementById("balance");
+    const lastWinEl = document.getElementById("lastWin");
+    const betEl = document.getElementById("bet");
+    const messageEl = document.getElementById("message");
+    const spinBtn = document.getElementById("spin");
+    const reels = [
+      document.getElementById("reel0"),
+      document.getElementById("reel1"),
+      document.getElementById("reel2")
+    ];
+
+    let balance = 1000;
+    let spinning = false;
+
+    function formatPoints(value) {
+      return value.toLocaleString("pt-BR", {
+        maximumFractionDigits: 2
+      });
+    }
+
+    function updateBalance() {
+      balanceEl.textContent = formatPoints(balance);
+    }
+
+    function getBet() {
+      const value = Number(betEl.value);
+
+      if (!Number.isFinite(value)) return 0;
+
+      return Math.floor(value);
+    }
+
+    function setMessage(text, type = "") {
+      messageEl.textContent = text;
+      messageEl.className = "message" + (type ? " " + type : "");
+    }
+
+    function randomSymbol() {
+      return symbols[Math.floor(Math.random() * symbols.length)];
+    }
+
+    function getPrize(result, bet) {
+      const [a, b, c] = result.map(symbol => symbol.icon);
+
+      if (a === b && b === c) {
+        if (a === "💎") return bet * 10;
+        if (a === "7️⃣") return bet * 8;
+        if (a === "⭐") return bet * 5;
+        if (a === "🍒") return bet * 3;
+
+        return bet * 2;
+      }
+
+      if (a === b || a === c || b === c) {
+        return bet * 1.5;
+      }
+
+      return 0;
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function spin() {
+      if (spinning) return;
+
+      const bet = getBet();
+
+      if (!Number.isInteger(bet) || bet < 1) {
+        setMessage("Digite uma aposta válida!", "lose");
+        return;
+      }
+
+      if (bet > balance) {
+        setMessage("Saldo insuficiente para essa aposta!", "lose");
+        return;
+      }
+
+      spinning = true;
+      spinBtn.disabled = true;
+      betEl.disabled = true;
+      document.getElementById("minus").disabled = true;
+      document.getElementById("plus").disabled = true;
+
+      balance -= bet;
+      lastWinEl.textContent = "0";
+      updateBalance();
+      setMessage("Os rolos estão girando...");
+
+      reels.forEach(reel => reel.classList.add("spinning"));
+
+      const result = reels.map(() => randomSymbol());
+
+      for (let i = 0; i < reels.length; i++) {
+        const start = Date.now();
+
+        while (Date.now() - start < 850 + i * 550) {
+          reels[i].textContent = randomSymbol().icon;
+          await wait(85);
+        }
+
+        reels[i].textContent = result[i].icon;
+        reels[i].classList.remove("spinning");
+      }
+
+      const prize = getPrize(result, bet);
+
+      if (prize > 0) {
+        balance += prize;
+        lastWinEl.textContent = formatPoints(prize);
+        setMessage(
+          `🎉 Você ganhou ${formatPoints(prize)} pontos!`,
+          "win"
+        );
+      } else {
+        setMessage("Não foi dessa vez! Tente novamente.", "lose");
+      }
+
+      updateBalance();
+
+      spinning = false;
+      spinBtn.disabled = false;
+      betEl.disabled = false;
+      document.getElementById("minus").disabled = false;
+      document.getElementById("plus").disabled = false;
+    }
+
+    spinBtn.addEventListener("click", spin);
+
+    document.getElementById("minus").addEventListener("click", () => {
+      if (spinning) return;
+      betEl.value = Math.max(1, getBet() - 10);
+    });
+
+    document.getElementById("plus").addEventListener("click", () => {
+      if (spinning) return;
+      betEl.value = Math.min(1000, getBet() + 10);
+    });
+
+    betEl.addEventListener("change", () => {
+      const value = getBet();
+      betEl.value = Math.max(1, Math.min(1000, value || 1));
+    });
+
+    document.getElementById("reset").addEventListener("click", () => {
+      if (spinning) return;
+
+      balance = 1000;
+      lastWinEl.textContent = "0";
+      updateBalance();
+      setMessage("Saldo restaurado! Boa sorte!");
+      betEl.value = 10;
+    });
+
+    updateBalance();
+  </script>
+</body>
+</html>
