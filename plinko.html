@@ -1,0 +1,1002 @@
+
+    <!DOCTYPE html>
+    <html lang="pt-BR">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <title>BETSPIN | Plinko</title>
+
+        <style>
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                min-height: 100vh;
+                font-family: Arial, Helvetica, sans-serif;
+                background:
+                    radial-gradient(circle at top, #3b1f35 0%, #1f2022 35%, #121212 75%);
+                color: #fff;
+                padding: 20px;
+            }
+
+            .game {
+                width: 100%;
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+                background: #1f2122;
+                border: 1px solid #3a3c3d;
+                border-radius: 18px;
+                box-shadow: 0 20px 70px rgba(0, 0, 0, 0.6);
+            }
+
+            .back {
+                display: inline-block;
+                margin-bottom: 18px;
+                color: #aaa;
+                font-size: 13px;
+                text-decoration: none;
+            }
+
+            .back:hover {
+                color: #ec6090;
+            }
+
+            /* CABEÇALHO */
+
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 18px;
+                margin-bottom: 22px;
+            }
+
+            .title {
+                font-size: 25px;
+                font-weight: 800;
+            }
+
+            .title span {
+                color: #ec6090;
+            }
+
+            .status {
+                margin-top: 6px;
+                color: #aaa;
+                font-size: 13px;
+            }
+
+            .balance {
+                min-width: 150px;
+                padding: 12px 18px;
+                background: #181a1b;
+                border: 1px solid #343637;
+                border-radius: 12px;
+                text-align: center;
+            }
+
+            .balance-label {
+                color: #888;
+                font-size: 11px;
+                font-weight: bold;
+                letter-spacing: 1px;
+                margin-bottom: 4px;
+            }
+
+            .balance-value {
+                color: #ec6090;
+                font-size: 21px;
+                font-weight: 800;
+            }
+
+            .multiplier {
+                color: #fff;
+                font-size: 35px;
+                font-weight: 800;
+                text-shadow: 0 0 15px rgba(236, 96, 144, 0.45);
+                white-space: nowrap;
+            }
+
+            /* TABULEIRO */
+
+            .board-shell {
+                width: 100%;
+                max-width: 700px;
+                margin: 0 auto;
+                padding: 14px 10px 10px;
+                background:
+                    radial-gradient(circle at top, rgba(115, 87, 217, 0.13), transparent 60%),
+                    #151718;
+                border: 1px solid #343637;
+                border-radius: 15px;
+                overflow: hidden;
+            }
+
+            .board-heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+                padding: 0 8px 10px;
+                color: #999;
+                font-size: 11px;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
+
+            .board-heading span:first-child {
+                color: #ec6090;
+            }
+
+            canvas {
+                display: block;
+                width: 100%;
+                height: 480px;
+            }
+
+            /* CONTROLES */
+
+            .controls {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-top: 20px;
+            }
+
+            .panel {
+                min-width: 0;
+                padding: 16px;
+                background: #181a1b;
+                border: 1px solid #343637;
+                border-radius: 13px;
+            }
+
+            .panel-title {
+                margin-bottom: 14px;
+                color: #999;
+                font-size: 12px;
+                font-weight: bold;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .panel label {
+                display: block;
+                color: #aaa;
+                font-size: 13px;
+                margin-bottom: 6px;
+            }
+
+            .panel input {
+                display: block;
+                width: 100%;
+                padding: 12px;
+                margin-bottom: 12px;
+                background: #111;
+                border: 1px solid #3a3c3d;
+                border-radius: 8px;
+                color: #fff;
+                font-size: 15px;
+                outline: none;
+            }
+
+            .panel input:focus {
+                border-color: #ec6090;
+            }
+
+            .panel button {
+                display: block;
+                width: 100%;
+                min-height: 46px;
+                padding: 12px;
+                margin-top: 10px;
+                border: none;
+                border-radius: 10px;
+                background: #ec6090;
+                color: #fff;
+                font-size: 15px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: filter 0.15s, transform 0.1s;
+            }
+
+            .panel button:hover:not(:disabled) {
+                filter: brightness(1.12);
+            }
+
+            .panel button:active:not(:disabled) {
+                transform: scale(0.98);
+            }
+
+            .panel button:disabled {
+                opacity: 0.4;
+                cursor: not-allowed;
+            }
+
+            #resetBalance {
+                background: #333638;
+            }
+
+            .result {
+                min-height: 58px;
+                margin-top: 10px;
+                font-size: 20px;
+                font-weight: 800;
+                line-height: 1.5;
+                overflow-wrap: anywhere;
+            }
+
+            .description {
+                color: #999;
+                font-size: 13px;
+                line-height: 1.7;
+            }
+
+            .info {
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+                flex-wrap: wrap;
+                margin-top: 14px;
+                color: #888;
+                font-size: 13px;
+            }
+
+            .info b {
+                color: #fff;
+            }
+
+            .notice {
+                margin-top: 16px;
+                color: #777;
+                font-size: 11px;
+                line-height: 1.5;
+                text-align: center;
+            }
+
+            /* CELULAR */
+
+            @media (max-width: 700px) {
+                body {
+                    padding: 10px;
+                }
+
+                .game {
+                    padding: 12px;
+                }
+
+                .header {
+                    gap: 12px;
+                }
+
+                .title {
+                    font-size: 22px;
+                }
+
+                .multiplier {
+                    font-size: 29px;
+                }
+
+                canvas {
+                    height: 430px;
+                }
+
+                .controls {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                }
+
+                .board-heading {
+                    font-size: 10px;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+
+        <main class="game">
+
+            <a href="index.html" class="back">
+                ← Voltar para os jogos
+            </a>
+
+            <!-- CABEÇALHO -->
+
+            <div class="header">
+                <div>
+                    <div class="title">
+                        🟣 <span>Plinko</span>
+                    </div>
+
+                    <div class="status" id="status">
+                        Pronto para jogar
+                    </div>
+                </div>
+
+                <div class="balance">
+                    <div class="balance-label">🪙 SALDO</div>
+                    <div class="balance-value" id="balance">
+                        1000 pontos
+                    </div>
+                </div>
+
+                <div class="multiplier" id="multiplier">
+                    1.00x
+                </div>
+            </div>
+
+            <!-- TABULEIRO ANIMADO -->
+
+            <div class="board-shell">
+
+                <div class="board-heading">
+                    <span>BETSPIN PLINKO</span>
+                    <span>ONDE A BOLINHA VAI CAIR?</span>
+                </div>
+
+                <canvas
+                    id="plinkoCanvas"
+                    aria-label="Tabuleiro Plinko com pinos e multiplicadores">
+                </canvas>
+
+            </div>
+
+            <!-- CONTROLES -->
+
+            <div class="controls">
+
+                <section class="panel">
+
+                    <div class="panel-title">
+                        Sua rodada
+                    </div>
+
+                    <label for="bet">
+                        Pontos da rodada
+                    </label>
+
+                    <input
+                        id="bet"
+                        type="number"
+                        min="1"
+                        step="1"
+                        value="10"
+                    >
+
+                    <button id="dropBall">
+                        🟣 Soltar bolinha
+                    </button>
+
+                    <button id="resetBalance">
+                        🔄 Restaurar 1.000 pontos
+                    </button>
+
+                    <div class="info">
+                        <span>
+                            Aposta:
+                            <b id="value">10</b>
+                        </span>
+
+                        <span>
+                            Rodada:
+                            <b id="roundStatus">Parado</b>
+                        </span>
+                    </div>
+
+                </section>
+
+                <section class="panel">
+
+                    <div class="panel-title">
+                        Resultado
+                    </div>
+
+                    <div class="result" id="result">
+                        —
+                    </div>
+
+                    <p class="description">
+                        Solte a bolinha e acompanhe seu percurso pelos pinos.
+                        O multiplicador da casa onde ela cair define quantos
+                        pontos serão devolvidos ao seu saldo.
+                    </p>
+
+                </section>
+
+            </div>
+
+            <p class="notice">
+                Jogo de demonstração com pontos fictícios. Nenhum dinheiro real é utilizado.
+            </p>
+
+        </main>
+
+        <script>
+            /* =========================================
+            ELEMENTOS DA PÁGINA
+            ========================================= */
+
+            const canvas = document.getElementById("plinkoCanvas");
+            const ctx = canvas.getContext("2d");
+
+            const balanceEl = document.getElementById("balance");
+            const multiplierEl = document.getElementById("multiplier");
+            const statusEl = document.getElementById("status");
+            const resultEl = document.getElementById("result");
+            const betInput = document.getElementById("bet");
+            const valueEl = document.getElementById("value");
+            const roundStatusEl = document.getElementById("roundStatus");
+            const dropBallBtn = document.getElementById("dropBall");
+            const resetBalanceBtn = document.getElementById("resetBalance");
+
+            /* =========================================
+            CONFIGURAÇÕES DO JOGO
+            ========================================= */
+
+            const ROWS = 8;
+
+            // Existem 9 casas de chegada para 8 fileiras de decisões.
+            const MULTIPLIERS = [
+                5.00, 2.00, 1.40, 1.10, 0.50,
+                1.10, 1.40, 2.00, 5.00
+            ];
+
+            let balance = 1000;
+            let running = false;
+            let currentBet = 0;
+
+            let ball = null;
+            let trail = [];
+            let lastResultIndex = null;
+            let roundPath = [];
+
+            let animationId = null;
+
+            /* =========================================
+            TAMANHO DO TABULEIRO
+            ========================================= */
+
+            function getMetrics() {
+                const width = canvas.clientWidth || 620;
+                const height = canvas.clientHeight || 480;
+
+                const spacing = Math.max(
+                    18,
+                    Math.min((width - 32) / 9, 70)
+                );
+
+                const rowGap = Math.min(
+                    42,
+                    (height - 145) / (ROWS - 1)
+                );
+
+                return {
+                    width,
+                    height,
+                    center: width / 2,
+                    spacing,
+                    topY: 50,
+                    rowGap,
+                    binTop: height - 54,
+                    binHeight: 42
+                };
+            }
+
+            function pegPosition(row, index, m) {
+                return {
+                    x: m.center + (index - row / 2) * m.spacing,
+                    y: m.topY + row * m.rowGap
+                };
+            }
+
+            function slotPosition(index, m) {
+                return {
+                    x: m.center + (index - ROWS / 2) * m.spacing,
+                    y: m.binTop + m.binHeight / 2
+                };
+            }
+
+            /* =========================================
+            DESENHAR FORMAS
+            ========================================= */
+
+            function roundedRect(context, x, y, width, height, radius) {
+                const r = Math.min(radius, width / 2, height / 2);
+
+                context.beginPath();
+                context.moveTo(x + r, y);
+                context.lineTo(x + width - r, y);
+                context.quadraticCurveTo(
+                    x + width, y,
+                    x + width, y + r
+                );
+                context.lineTo(x + width, y + height - r);
+                context.quadraticCurveTo(
+                    x + width, y + height,
+                    x + width - r, y + height
+                );
+                context.lineTo(x + r, y + height);
+                context.quadraticCurveTo(
+                    x, y + height,
+                    x, y + height - r
+                );
+                context.lineTo(x, y + r);
+                context.quadraticCurveTo(x, y, x + r, y);
+                context.closePath();
+            }
+
+            function slotColor(multiplier) {
+                if (multiplier >= 2) return "#ec6090";
+                if (multiplier >= 1.1) return "#7357d9";
+                return "#303235";
+            }
+
+            /* =========================================
+            DESENHAR TABULEIRO
+            ========================================= */
+
+            function drawBoard() {
+                const m = getMetrics();
+
+                ctx.clearRect(0, 0, m.width, m.height);
+
+                // Grade discreta no fundo.
+                ctx.save();
+                ctx.strokeStyle = "rgba(255,255,255,0.035)";
+                ctx.lineWidth = 1;
+
+                for (let x = 0; x < m.width; x += 35) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, m.height);
+                    ctx.stroke();
+                }
+
+                for (let y = 0; y < m.height; y += 35) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(m.width, y);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+
+                // Casas com multiplicadores.
+                MULTIPLIERS.forEach((multiplier, index) => {
+                    const center = slotPosition(index, m);
+                    const width = m.spacing - 4;
+                    const x = center.x - width / 2;
+                    const y = m.binTop;
+
+                    roundedRect(
+                        ctx, x, y, width, m.binHeight, 5
+                    );
+
+                    ctx.fillStyle = slotColor(multiplier);
+                    ctx.fill();
+
+                    ctx.lineWidth =
+                        lastResultIndex === index ? 2.5 : 1;
+
+                    ctx.strokeStyle =
+                        lastResultIndex === index
+                            ? "#ffffff"
+                            : "rgba(255,255,255,0.15)";
+
+                    ctx.stroke();
+
+                    ctx.fillStyle = "#ffffff";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+
+                    const fontSize = Math.max(
+                        8,
+                        Math.min(12, m.spacing * 0.19)
+                    );
+
+                    ctx.font = `bold ${fontSize}px Arial`;
+
+                    ctx.fillText(
+                        multiplier.toFixed(2) + "x",
+                        center.x,
+                        y + m.binHeight / 2
+                    );
+                });
+
+                // Rastro da bolinha.
+                if (trail.length > 1) {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(trail[0].x, trail[0].y);
+
+                    for (let i = 1; i < trail.length; i++) {
+                        ctx.lineTo(trail[i].x, trail[i].y);
+                    }
+
+                    ctx.lineCap = "round";
+                    ctx.lineJoin = "round";
+                    ctx.strokeStyle = "rgba(236,96,144,0.55)";
+                    ctx.lineWidth = 3;
+                    ctx.shadowColor = "#ec6090";
+                    ctx.shadowBlur = 12;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                // Pinos triangulares.
+                for (let row = 0; row < ROWS; row++) {
+                    for (let col = 0; col <= row; col++) {
+                        const p = pegPosition(row, col, m);
+
+                        const radius = Math.max(
+                            3,
+                            Math.min(5, m.spacing * 0.075)
+                        );
+
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+
+                        ctx.fillStyle = "#d9c8ff";
+                        ctx.shadowColor = "#7357d9";
+                        ctx.shadowBlur = 8;
+                        ctx.fill();
+
+                        ctx.restore();
+                    }
+                }
+
+                // Bolinha.
+                if (ball) {
+                    ctx.save();
+
+                    ctx.beginPath();
+                    ctx.arc(ball.x, ball.y, 8, 0, Math.PI * 2);
+
+                    const gradient = ctx.createRadialGradient(
+                        ball.x - 3,
+                        ball.y - 3,
+                        1,
+                        ball.x,
+                        ball.y,
+                        9
+                    );
+
+                    gradient.addColorStop(0, "#ffffff");
+                    gradient.addColorStop(0.35, "#ffb5d0");
+                    gradient.addColorStop(1, "#ec6090");
+
+                    ctx.fillStyle = gradient;
+                    ctx.shadowColor = "#ec6090";
+                    ctx.shadowBlur = 18;
+                    ctx.fill();
+
+                    ctx.lineWidth = 1;
+                    ctx.strokeStyle = "#ffffff";
+                    ctx.stroke();
+
+                    ctx.restore();
+                }
+            }
+
+            /* =========================================
+            REDIMENSIONAR CANVAS
+            ========================================= */
+
+            function resizeCanvas() {
+                const rect = canvas.getBoundingClientRect();
+                const dpr = window.devicePixelRatio || 1;
+
+                canvas.width = Math.round(rect.width * dpr);
+                canvas.height = Math.round(rect.height * dpr);
+
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+                drawBoard();
+            }
+
+            window.addEventListener("resize", resizeCanvas);
+
+            /* =========================================
+            SALDO
+            ========================================= */
+
+            function updateBalance() {
+                balanceEl.textContent =
+                    Math.floor(balance) + " pontos";
+            }
+
+            function checkBalance() {
+                if (balance <= 0) {
+                    dropBallBtn.disabled = true;
+                    statusEl.textContent = "Você ficou sem pontos.";
+                    resultEl.textContent = "🪙 Saldo zerado";
+                } else {
+                    dropBallBtn.disabled = false;
+                }
+            }
+
+            /* =========================================
+            SOLTAR BOLINHA
+            ========================================= */
+
+            function startGame() {
+                if (running) return;
+
+                const bet = Math.floor(Number(betInput.value));
+
+                if (!Number.isFinite(bet) || bet < 1) {
+                    resultEl.textContent =
+                        "⚠️ Digite uma aposta de pelo menos 1 ponto.";
+                    return;
+                }
+
+                if (bet > balance) {
+                    resultEl.textContent =
+                        "⚠️ Você não tem pontos suficientes.";
+                    return;
+                }
+
+                currentBet = bet;
+                balance -= currentBet;
+
+                updateBalance();
+                valueEl.textContent = currentBet;
+
+                // Decide aleatoriamente o caminho desta rodada.
+                roundPath = Array.from(
+                    { length: ROWS },
+                    () => Math.random() < 0.5 ? 0 : 1
+                );
+
+                running = true;
+                lastResultIndex = null;
+                ball = null;
+                trail = [];
+
+                dropBallBtn.disabled = true;
+                resetBalanceBtn.disabled = true;
+                betInput.disabled = true;
+
+                multiplierEl.textContent = "1.00x";
+                statusEl.textContent = "A bolinha está caindo...";
+                roundStatusEl.textContent = "Em andamento";
+                resultEl.textContent = "Boa sorte!";
+
+                const m = getMetrics();
+
+                ball = {
+                    x: m.center,
+                    y: m.topY - 35
+                };
+
+                trail.push({ x: ball.x, y: ball.y });
+
+                const introStart = performance.now();
+                const introDuration = 220;
+
+                function introFrame(now) {
+                    if (!running) return;
+
+                    const progress = Math.min(
+                        1,
+                        (now - introStart) / introDuration
+                    );
+
+                    const eased =
+                        progress * progress * (3 - 2 * progress);
+
+                    const currentMetrics = getMetrics();
+
+                    ball.x = currentMetrics.center;
+                    ball.y =
+                        currentMetrics.topY - 35
+                        + 35 * eased;
+
+                    trail.push({ x: ball.x, y: ball.y });
+
+                    if (trail.length > 30) trail.shift();
+
+                    drawBoard();
+
+                    if (progress < 1) {
+                        animationId = requestAnimationFrame(introFrame);
+                    } else {
+                        animateStep(0, 0);
+                    }
+                }
+
+                animationId = requestAnimationFrame(introFrame);
+            }
+
+            /* =========================================
+            ANIMAR CAMINHO PELOS PINOS
+            ========================================= */
+
+            function animateStep(step, currentIndex) {
+                if (!running) return;
+
+                const m = getMetrics();
+
+                const start = pegPosition(step, currentIndex, m);
+
+                const direction = roundPath[step];
+                const nextIndex = currentIndex + direction;
+
+                let target;
+
+                if (step < ROWS - 1) {
+                    target = pegPosition(step + 1, nextIndex, m);
+                } else {
+                    target = slotPosition(nextIndex, m);
+                }
+
+                const startTime = performance.now();
+                const duration = 260;
+
+                function frame(now) {
+                    if (!running) return;
+
+                    const progress = Math.min(
+                        1,
+                        (now - startTime) / duration
+                    );
+
+                    const eased =
+                        progress * progress * (3 - 2 * progress);
+
+                    const wiggle =
+                        Math.sin(progress * Math.PI)
+                        * (direction === 1 ? 1 : -1)
+                        * m.spacing * 0.10;
+
+                    ball.x =
+                        start.x
+                        + (target.x - start.x) * eased
+                        + wiggle;
+
+                    ball.y =
+                        start.y
+                        + (target.y - start.y) * eased;
+
+                    trail.push({ x: ball.x, y: ball.y });
+
+                    if (trail.length > 30) {
+                        trail.shift();
+                    }
+
+                    drawBoard();
+
+                    if (progress < 1) {
+                        animationId = requestAnimationFrame(frame);
+                    } else {
+                        ball.x = target.x;
+                        ball.y = target.y;
+                        drawBoard();
+
+                        if (step < ROWS - 1) {
+                            animateStep(step + 1, nextIndex);
+                        } else {
+                            finishRound(nextIndex);
+                        }
+                    }
+                }
+
+                animationId = requestAnimationFrame(frame);
+            }
+
+            /* =========================================
+            RESULTADO DA RODADA
+            ========================================= */
+
+            function finishRound(slotIndex) {
+                running = false;
+
+                if (animationId !== null) {
+                    cancelAnimationFrame(animationId);
+                }
+
+                const multiplier = MULTIPLIERS[slotIndex];
+                const payout = Math.floor(currentBet * multiplier);
+                const net = payout - currentBet;
+
+                balance += payout;
+                lastResultIndex = slotIndex;
+
+                multiplierEl.textContent =
+                    multiplier.toFixed(2) + "x";
+
+                statusEl.textContent =
+                    "A bolinha chegou à casa!";
+
+                roundStatusEl.textContent = "Finalizada";
+
+                if (net > 0) {
+                    resultEl.textContent =
+                        "✅ Recebeu " + payout
+                        + " pontos (+" + net + " líquidos)";
+                } else if (net === 0) {
+                    resultEl.textContent =
+                        "↔ Recebeu " + payout
+                        + " pontos: aposta recuperada";
+                } else {
+                    resultEl.textContent =
+                        "↘ Recebeu " + payout
+                        + " pontos (" + net + " líquidos)";
+                }
+
+                currentBet = 0;
+
+                dropBallBtn.disabled = false;
+                resetBalanceBtn.disabled = false;
+                betInput.disabled = false;
+
+                updateBalance();
+                checkBalance();
+                drawBoard();
+            }
+
+            /* =========================================
+            RESTAURAR SALDO
+            ========================================= */
+
+            resetBalanceBtn.addEventListener("click", function () {
+                if (running) return;
+
+                balance = 1000;
+                currentBet = 0;
+                lastResultIndex = null;
+                ball = null;
+                trail = [];
+
+                updateBalance();
+
+                multiplierEl.textContent = "1.00x";
+                statusEl.textContent = "Pronto para jogar";
+                resultEl.textContent = "🔄 Saldo restaurado";
+                roundStatusEl.textContent = "Parado";
+                valueEl.textContent = Math.max(
+                    0,
+                    Math.floor(Number(betInput.value) || 0)
+                );
+
+                dropBallBtn.disabled = false;
+
+                checkBalance();
+                drawBoard();
+            });
+
+            /* =========================================
+            ATUALIZAR CAMPO DE APOSTA
+            ========================================= */
+
+            betInput.addEventListener("input", function () {
+                const value = Math.max(
+                    0,
+                    Math.floor(Number(betInput.value) || 0)
+                );
+
+                valueEl.textContent = value;
+            });
+
+            dropBallBtn.addEventListener("click", startGame);
+
+            /* =========================================
+            INICIALIZAÇÃO
+            ========================================= */
+
+            updateBalance();
+            resizeCanvas();
+            checkBalance();
+        </script>
+
+    </body>
+    </html>
